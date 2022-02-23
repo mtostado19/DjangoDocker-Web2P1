@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  api:
+    #define de dónde va a sacar la imagen   
+    build: 
+        context: .
+    container_name: api
+    
+    # Reinicia
+    # restart: "on-failure"
+    
+    # No debería ir en producción, sirve para que no tengas que generar una imagen por cada cambio que le hagas al código. 
+    # Los archivos de /app realmente estarán apuntando a ./app dentro de la computadora 
+    volumes:
+        - ./app:/app
+
+    # Define un puente entre los dos puertos  [puerto_computadora : puerto_contenedor]
+    ports:
+        - "80:8000"
+
+    command:
+        sh -c "python manage.py runserver 0.0.0.0:8000"
+
+  dbapi:
+    image: mariadb:10.7.1
+    container_name: dbapi
+    environment:
+        - MYSQL_ROOT_PASSWORD=1234
+    volumes:
+        - ./db:/var/lib/mysql
+        - ./db_config:/etc/mysql/conf.d
+    ports:
+        - 3334:3306
